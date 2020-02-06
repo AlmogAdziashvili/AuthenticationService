@@ -1,0 +1,46 @@
+{
+  "name": "authentication-server",
+  "version": "0.1.0",
+  "description": "authentication and authorization server for web apps",
+  "main": "app.js",
+  "scripts": {
+    "start": "set NODE_ENV=production&& node ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "test": "set NODE_ENV=production&& mocha ./tests/ --exit",
+    "testN": "set NODE_ENV=production&& mocha ./tests/ --reporter nyan --exit",
+    "coverage": "set NODE_ENV=production&& nyc mocha ./tests/ --exit"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "debug": "^2.6.9",
+    "express": "^4.16.1",
+    "helmet": "^3.21.2",
+    "morgan": "^1.9.1",
+    "mysql2": "^2.1.0",
+    "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0",
+    "problem-json": "^0.3.0",
+    "sequelize": "^5.21.3",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "mocha": "^7.0.0",
+    "nodemon": "^2.0.2",
+    "nyc": "^15.0.0",
+    "supertest": "^4.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlmogAdziashvili/AuthenticationService.git"
+  },
+  "author": "Almog Adziashvili",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlmogAdziashvili/AuthenticationService/issues"
+  },
+  "homepage": "https://github.com/AlmogAdziashvili/AuthenticationService#readme"
+}
