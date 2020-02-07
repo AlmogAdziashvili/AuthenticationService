@@ -4,26 +4,17 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const passport = require('passport');
-const Sequelize = require('sequelize');
 require('./handlers/passport_google_config')(passport);
+require('./handlers/passport_jwt_config')(passport);
+require('./handlers/database');
 
 const logger = require('./handlers/logger');
 const { statusCodes, generateError } = require('./handlers/utils');
 
 const authRouter = require('./routes/auth_route');
+const googleRoute = require('./routes/google_route');
 
 const app = express();
-
-const sequelize = new Sequelize('authentication', 'root', 'root', {
-  host: 'localhost',
-  dialect: 'mysql',
-});
-
-sequelize.authenticate().then(() => {
-  logger.info('Connection has been established successfully.');
-}).catch((err) => {
-  logger.info('Unable to connect to the database:', err);
-});
 
 app.use(morgan('combined', { stream: logger.stream }));
 app.use(express.json());
@@ -35,6 +26,7 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api', authRouter);
+app.use('/api/google', googleRoute);
 
 // 404
 app.use((req, res) => generateError(req, res, statusCodes.notFound, 'This path is not on the API'));

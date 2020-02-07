@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 const request = require('supertest');
 const app = require('../app');
-const { statusCodes } = require('../app_handlers/utils');
+const { statusCodes } = require('../handlers/utils');
 
 const ID = 32;
 

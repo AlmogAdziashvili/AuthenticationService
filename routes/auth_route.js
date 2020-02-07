@@ -1,9 +1,12 @@
-/* eslint-disable max-len */
 const express = require('express');
-// const {
-//   promiseHandler, statusCodes, generateError, cacheHandler, cache, deleteCache,
-// } = require('../handlers/utils');
+const passport = require('passport');
 
 const router = express.Router();
+
+router.get('/current', (req, res, next) => passport.authenticate(
+  'jwt',
+  { session: false },
+  (err, user) => res.send(user),
+)(req, res, next));
 
 module.exports = router;

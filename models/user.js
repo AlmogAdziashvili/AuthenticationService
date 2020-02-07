@@ -1,10 +1,12 @@
-const { define, STRING, DATE } = require('sequelize');
+const { STRING, BOOLEAN, DATE } = require('sequelize');
+const sequelize = require('../handlers/database');
 
-const User = define('user', {
+const User = sequelize.define('user', {
   email: { type: STRING, allowNull: false, validate: { isEmail: true } },
   firstName: { type: STRING, allowNull: false, validate: { isAlpha: true } },
   lastName: { type: STRING, allowNull: false, validate: { isAlpha: true } },
-  password: { type: STRING, allowNull: false },
+  password: { type: STRING },
+  googleAccount: { type: BOOLEAN },
   resetPasswordToken: { type: STRING },
   resetPasswordExpires: { type: DATE },
 });
