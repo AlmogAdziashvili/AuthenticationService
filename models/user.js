@@ -11,6 +11,6 @@ const User = sequelize.define('user', {
   resetPasswordExpires: { type: DATE },
 });
 
-User.sync({ force: true });
+User.sync();
 
 module.exports = User;

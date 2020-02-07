@@ -11,5 +11,8 @@ module.exports = {
   },
   jwtCredentials: {
     secret: 'secret',
-  }
+  },
+  webServerUrls: {
+    indexPage: 'http://localhost:3000/'
+  },
 };

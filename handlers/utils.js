@@ -1,5 +1,6 @@
 const { Document } = require('problem-json');
 const passport = require('passport');
+const logger = require('./logger');
 
 const utils = {};
 
@@ -26,11 +27,14 @@ utils.promiseHandler = (
   .catch(onRejection);
 
 // RFC 7807 Error Object Constructor
-utils.generateError = (req, res, code, detail) => res.status(code).json(new Document({
-  type: req.path,
-  title: getKeyByValue(utils.statusCodes, code),
-  detail,
-}));
+utils.generateError = (req, res, code, detail) => {
+  logger.warn(`Error at ${req.path} - error code: ${code} - error message: ${detail}`);
+  return res.status(code).json(new Document({
+    type: req.path,
+    title: getKeyByValue(utils.statusCodes, code),
+    detail,
+  }));
+};
 
 // Middleware - attach user to req object or send an error to the client
 utils.jwtAutenticator = () => (req, res, next) => passport.authenticate('jwt', { session: false },

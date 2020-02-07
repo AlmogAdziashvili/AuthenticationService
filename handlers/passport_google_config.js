@@ -2,6 +2,7 @@ const Strategy = require('passport-google-oauth20');
 const User = require('../models/user');
 const { clientID, clientSecret } = require('../.config').googleCredentials;
 const { promiseHandler } = require('./utils');
+const logger = require('./logger');
 
 module.exports = (passport) => passport.use(
   new Strategy({
@@ -18,7 +19,10 @@ module.exports = (passport) => passport.use(
         where: { email },
         defaults: { firstName: given_name, lastName: family_name, googleAccount: true },
       }),
-      ([user]) => done(null, user),
+      ([user]) => {
+        logger.info(`user: ${user.id} logged in successfully using google`);
+        return done(null, user);
+      },
       (err) => done(err),
     );
   }),
