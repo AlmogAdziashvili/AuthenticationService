@@ -3,6 +3,6 @@
 Authentication and Authorization Service for Web Applications Using:
 * Node JS
 * Express
-* Passport.js
-* JWT
+* Passport.js - Google Strategy
+* Passport.js - JWT
 * MySQL
