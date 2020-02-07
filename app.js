@@ -9,7 +9,7 @@ require('./handlers/passport_jwt_config')(passport);
 require('./handlers/database');
 
 const logger = require('./handlers/logger');
-const { statusCodes, generateError } = require('./handlers/utils');
+const { statusCodes, generateError, jwtAutenticator } = require('./handlers/utils');
 
 const authRouter = require('./routes/auth_route');
 const googleRoute = require('./routes/google_route');
@@ -23,6 +23,7 @@ app.use(cookieParser());
 app.use(cors({ origin: true }));
 app.use(helmet());
 app.use(passport.initialize());
+app.use(jwtAutenticator());
 
 // Routes
 app.use('/api', authRouter);

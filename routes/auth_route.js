@@ -1,12 +1,9 @@
 const express = require('express');
-const passport = require('passport');
+const { statusCodes } = require('../handlers/utils');
 
 const router = express.Router();
 
-router.get('/current', (req, res, next) => passport.authenticate(
-  'jwt',
-  { session: false },
-  (err, user) => res.send(user),
-)(req, res, next));
+// Send the user currently logged in
+router.get('/current', (req, res) => res.status(statusCodes.OK).json(req.user));
 
 module.exports = router;

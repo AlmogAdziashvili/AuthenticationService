@@ -2,12 +2,13 @@ const { Router } = require('express');
 const passport = require('passport');
 const { sign } = require('jsonwebtoken');
 const { secret } = require('../.config').jwtCredentials;
+const { redirectUserIfLoggedIn, statusCodes } = require('../handlers/utils');
 
 const router = Router();
 
 router.get(
   '/',
-  (req, res, next) => (req.user ? res.redirect('/') : next()),
+  redirectUserIfLoggedIn('/api/current'),
   passport.authenticate('google', {
     session: false,
     scope: ['profile', 'email'],
@@ -16,6 +17,6 @@ router.get(
 
 router.get('/redirect',
   passport.authenticate('google', { session: false }),
-  (req, res) => res.cookie('jwt', sign({ id: req.user.id }, secret, { expiresIn: '12h' }), { maxAge: 43200000 }).redirect('/api/current'));
+  (req, res) => res.status(statusCodes.OK).cookie('jwt', sign({ id: req.user.id }, secret, { expiresIn: '12h' }), { maxAge: 43200000 }).redirect('/api/current'));
 
 module.exports = router;
