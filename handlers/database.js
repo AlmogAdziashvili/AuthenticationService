@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const logger = require('./logger');
-const { promiseHandler } = require('./utils');
 const {
   database, userName, password, host,
 } = require('../.config').mySqlCredentials;
@@ -13,9 +12,9 @@ const sequelize = new Sequelize(database, userName, password, {
 });
 
 // Test the connection and log
-promiseHandler(
-  sequelize.authenticate(),
+sequelize.authenticate().then(
   () => logger.info('Connection with the DB has been established successfully.'),
+).catch(
   (err) => logger.error('Unable to connect to the database:', err),
 );
 

@@ -17,15 +17,6 @@ utils.statusCodes = {
   internalServerError: 500,
 };
 
-// Handle Promises by getting onFulfillment and onRejection functions
-utils.promiseHandler = (
-  promise,
-  onFulfillment,
-  onRejection,
-) => promise
-  .then(onFulfillment, onRejection)
-  .catch(onRejection);
-
 // RFC 7807 Error Object Constructor
 utils.generateError = (req, res, code, detail) => {
   logger.warn(`Error at ${req.path} - error code: ${code} - error message: ${detail}`);
