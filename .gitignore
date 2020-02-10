@@ -2,3 +2,4 @@
 /log/
 /.nyc_output/
 .config.js
+rest_client.http

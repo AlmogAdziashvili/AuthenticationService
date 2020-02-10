@@ -1,6 +1,6 @@
 {
   "name": "authentication-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "authentication and authorization server for web apps",
   "main": "app.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "mysql2": "^2.1.0",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
+    "passport-jwt": "^4.0.0",
     "problem-json": "^0.3.0",
     "sequelize": "^5.21.3",
     "winston": "^3.2.1"

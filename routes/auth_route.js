@@ -1,7 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { sign } = require('jsonwebtoken');
-const { statusCodes, redirectUserIfLoggedIn, generateError } = require('../handlers/utils');
+const {
+  statusCodes, redirectUserIfLoggedIn, generateError, redirectGuest,
+} = require('../handlers/utils');
 const { indexPage } = require('../.config').webServerUrls;
 const User = require('../models/user');
 const logger = require('../handlers/logger');
@@ -65,6 +67,44 @@ router.post('/auth',
       if (!isMatch) return generateError(req, res, statusCodes.unauthorized, 'bad credentials');
       logger.info(`user: ${user.id} logged in successfully`);
       return res.status(statusCodes.OK).cookie('jwt', sign({ id: req.user.id }, secret, { expiresIn: '12h' }), { maxAge: 43200000 }).redirect('/api/current');
+    } catch (err) {
+      return generateError(req, res, statusCodes.internalServerError, 'server error');
+    }
+  });
+
+// User info update
+router.put('/user',
+  redirectGuest('/'),
+  async (req, res) => {
+    try {
+      const { first_name, last_name } = req.body;
+      if (!first_name && !last_name) return generateError(req, res, statusCodes.badRequest, 'missing credentials');
+      if (last_name) {
+        if (!last_name.match(/^[A-Za-z]+$/)) return generateError(req, res, statusCodes.badRequest, 'unvalid credentials');
+        req.user.lastName = last_name;
+      }
+      if (first_name) {
+        if (!first_name.match(/^[A-Za-z]+$/)) return generateError(req, res, statusCodes.badRequest, 'unvalid credentials');
+        req.user.firstName = first_name;
+      }
+      await req.user.save();
+      logger.info(`user updated info, email: ${req.user.email}`);
+      return res.sendStatus(statusCodes.OK);
+    } catch (err) {
+      return generateError(req, res, statusCodes.internalServerError, 'server error');
+    }
+  });
+
+// User account delete
+router.delete('/user/:ID',
+  // TODO: Authorization check
+  async (req, res) => {
+    try {
+      const { ID } = req.params;
+      if (Number.isNaN(parseInt(ID))) return generateError(req, res, statusCodes.badRequest, 'unvalid credentials');
+      await User.destroy({ where: { id: ID } });
+      logger.info(`user deleted, id: ${ID}`);
+      return res.sendStatus(statusCodes.OK);
     } catch (err) {
       return generateError(req, res, statusCodes.internalServerError, 'server error');
     }
