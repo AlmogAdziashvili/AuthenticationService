@@ -17,6 +17,6 @@ router.get(
 
 router.get('/redirect',
   passport.authenticate('google', { session: false }),
-  (req, res) => res.status(statusCodes.OK).cookie('jwt', sign({ id: req.user.id }, secret, { expiresIn: '12h' }), { maxAge: 43200000 }).redirect('/api/current'));
+  (req, res) => res.status(statusCodes.OK).cookie('jwt', sign({ id: req.user.id }, secret, { expiresIn: '12h' }), { maxAge: 43200000 }).redirect('/api/user/current'));
 
 module.exports = router;
