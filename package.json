@@ -6,8 +6,8 @@
   "scripts": {
     "start": "set NODE_ENV=production&& node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "test": "set NODE_ENV=production&& mocha ./tests/ --exit",
-    "testN": "set NODE_ENV=production&& mocha ./tests/ --reporter nyan --exit",
+    "test": "set NODE_ENV=test&& mocha ./tests/ --exit",
+    "testN": "set NODE_ENV=test&& mocha ./tests/ --reporter nyan --exit",
     "coverage": "set NODE_ENV=production&& nyc mocha ./tests/ --exit"
   },
   "dependencies": {

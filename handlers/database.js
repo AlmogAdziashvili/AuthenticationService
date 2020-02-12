@@ -5,11 +5,15 @@ const {
 } = require('../.config').mySqlCredentials;
 
 // Establish the connection with the MySQL Server
-const sequelize = new Sequelize(database, userName, password, {
-  host,
-  dialect: 'mysql',
-  logging: false,
-});
+const sequelize = new Sequelize(
+  `${database}${process.env.NODE_ENV === 'test' ? 'test' : ''}`,
+  userName,
+  password,
+  {
+    host,
+    dialect: 'mysql',
+    logging: false,
+  });
 
 // Test the connection and log
 sequelize.authenticate().then(

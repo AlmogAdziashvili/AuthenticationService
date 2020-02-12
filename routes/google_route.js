@@ -2,13 +2,13 @@ const { Router } = require('express');
 const passport = require('passport');
 const { sign } = require('jsonwebtoken');
 const { secret } = require('../.config').jwtCredentials;
-const { redirectUserIfLoggedIn, statusCodes } = require('../handlers/utils');
+const { onlyGuests, statusCodes } = require('../handlers/utils');
 
 const router = Router();
 
 router.get(
   '/',
-  redirectUserIfLoggedIn('/api/current'),
+  onlyGuests('/api/current'),
   passport.authenticate('google', {
     session: false,
     scope: ['profile', 'email'],

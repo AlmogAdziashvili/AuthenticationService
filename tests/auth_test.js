@@ -3,140 +3,132 @@ const request = require('supertest');
 const app = require('../app');
 const { statusCodes } = require('../handlers/utils');
 
-const ID = 32;
-
-describe('POST /memes', () => {
-  describe('Valid Name', () => {
-    it('Code 201', (done) => {
+describe('Guest', () => {
+  describe('GET /api/user/current', () => {
+    it('Code 401', (done) => {
       request(app)
-        .post('/memes/')
-        .send({ name: 'moshe' })
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
+        .get('/api/user/current')
+        .set({ Accept: 'application/json' })
         .expect('Content-Type', /json/)
+        .expect(statusCodes.unauthorized, done);
+    });
+  });
+  describe('POST /api/user', () => {
+    it('Missing Data: Code 400', (done) => {
+      request(app)
+        .post('/api/user')
+        .set({ Accept: 'application/json' })
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.badRequest, done);
+    });
+    it('Unvalid Data: Code 400', (done) => {
+      request(app)
+        .post('/api/user')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test@test.com', first_name: 'test', last_name: 'test', password: '123456' })
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.badRequest, done);
+    });
+    it('Valid Data: Code 201', (done) => {
+      request(app)
+        .post('/api/user')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test@test.com', first_name: 'test', last_name: 'test', password: 'Aa123456' })
         .expect(statusCodes.created, done);
     });
-  });
-  describe('Invalid Name', () => {
-    it('Code 400', (done) => {
+    it('Email exists: Code 400', (done) => {
       request(app)
-        .post('/memes/')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
+        .post('/api/user')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test@test.com', first_name: 'test', last_name: 'test', password: '123456' })
         .expect('Content-Type', /json/)
         .expect(statusCodes.badRequest, done);
     });
   });
-});
-
-describe('GET /memes/:ID', () => {
-  describe('Valid ID', () => {
-    it('ID Found: Code 200', (done) => {
+  describe('POST /api/user/login', () => {
+    it('Missing Data: Code 400', (done) => {
       request(app)
-        .get(`/memes/${ID}`)
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
+        .post('/api/user/login')
+        .set({ Accept: 'application/json' })
+        .send({})
         .expect('Content-Type', /json/)
+        .expect(statusCodes.badRequest, done);
+    });
+    it('User not Exists: Code 401', (done) => {
+      request(app)
+        .post('/api/user/login')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test2@test.com', password: '123456' })
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.unauthorized, done);
+    });
+    it('Wrong Password: Code 401', (done) => {
+      request(app)
+        .post('/api/user/login')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test2@test.com', password: '123456' })
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.unauthorized, done);
+    });
+    it('Valid Data: Code 200', (done) => {
+      request(app)
+        .post('/api/user/login')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test@test.com', password: 'Aa123456' })
         .expect(statusCodes.OK, done);
     });
-    it('ID Not Found: Code 404', (done) => {
+  });
+  describe('PUT /api/user', () => {
+    it('Code 401', (done) => {
       request(app)
-        .get('/memes/0')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
+        .put('/api/user')
+        .set({ Accept: 'application/json' })
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.unauthorized, done);
+    });
+  });
+  describe('PUT /api/user', () => {
+    it('Code 401', (done) => {
+      request(app)
+        .put('/api/user')
+        .set({ Accept: 'application/json' })
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.unauthorized, done);
+    });
+  });
+  describe('DELETE /api/user', () => {
+    it('Code 401', (done) => {
+      request(app)
+        .delete('/api/user')
+        .set({ Accept: 'application/json' })
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.unauthorized, done);
+    });
+  });
+  describe('PUT /api/user/reset', () => {
+    it('Missing Data: Code 400', (done) => {
+      request(app)
+        .put('/api/user/reset')
+        .set({ Accept: 'application/json' })
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(statusCodes.badRequest, done);
+    });
+    it('User not Exists: Code 404', (done) => {
+      request(app)
+        .put('/api/user/reset')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test2@test.com' })
         .expect('Content-Type', /json/)
         .expect(statusCodes.notFound, done);
     });
-  });
-  describe('Invalid ID', () => {
-    it('Code 400', (done) => {
+    it('Valid Data: Code 200', (done) => {
       request(app)
-        .get('/memes/a')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.badRequest, done);
-    });
-  });
-});
-
-describe('GET /memes/?name=:name', () => {
-  describe('Valid Name', () => {
-    it('Name Found: Code 200', (done) => {
-      request(app)
-        .get('/memes/?name=moshe')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
+        .put('/api/user/reset')
+        .set({ Accept: 'application/json' })
+        .send({ email: 'test@test.com' })
         .expect(statusCodes.OK, done);
-    });
-    it('Name Not Found: Code 404', (done) => {
-      request(app)
-        .get('/memes/?name=0')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.notFound, done);
-    });
-  });
-  describe('Invalid Name', () => {
-    it('Code 400', (done) => {
-      request(app)
-        .get('/memes/')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.badRequest, done);
-    });
-  });
-});
-
-describe('PUT /memes/:ID', () => {
-  describe('Valid Parameters', () => {
-    it('ID Found: Code 200', (done) => {
-      request(app)
-        .put(`/memes/${ID}`)
-        .send({ name: 'almog3' })
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.OK, done);
-    });
-    it('ID Not Found: Code 404', (done) => {
-      request(app)
-        .put('/memes/0')
-        .send({ name: 'almog3' })
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.notFound, done);
-    });
-  });
-  describe('Invalid Parameters', () => {
-    it('missing name: Code 400', (done) => {
-      request(app)
-        .put('/memes/26')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.badRequest, done);
-    });
-  });
-});
-
-describe('DELETE /memes/:ID', () => {
-  describe('Valid ID', () => {
-    it('ID Found: Code 200', (done) => {
-      request(app)
-        .delete(`/memes/${ID}`)
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.OK, done);
-    });
-    it('ID Not Found: Code 404', (done) => {
-      request(app)
-        .delete('/memes/0')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.notFound, done);
-    });
-  });
-  describe('Invalid ID', () => {
-    it('Code 400', (done) => {
-      request(app)
-        .delete('/memes/a')
-        .set({ Accept: 'application/json', Authorization: 'Bearer lXbXuofmUY' })
-        .expect('Content-Type', /json/)
-        .expect(statusCodes.badRequest, done);
     });
   });
 });

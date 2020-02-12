@@ -15,7 +15,7 @@ logger.stream = {
 };
 
 // If we're not in production then **ALSO** log to the `console`
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
   logger.add(new transports.Console());
 }
 

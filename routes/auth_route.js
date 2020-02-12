@@ -5,9 +5,9 @@ const { randomBytes } = require('crypto');
 const { createTransport } = require('nodemailer');
 const { Op } = require('sequelize')
 const {
-  statusCodes, redirectUserIfLoggedIn, generateError, redirectGuest,
+  statusCodes, onlyGuests, generateError, onlyUsers,
 } = require('../handlers/utils');
-const { indexPage, resetPage } = require('../.config').webServerUrls;
+const { resetPage } = require('../.config').webServerUrls;
 const User = require('../models/user');
 const logger = require('../handlers/logger');
 const { jwtCredentials, emailCredentials } = require('../.config');
@@ -15,11 +15,11 @@ const { jwtCredentials, emailCredentials } = require('../.config');
 const router = express.Router();
 
 // Send the user currently logged in
-router.get('/user/current', (req, res) => res.status(statusCodes.OK).json(req.user));
+router.get('/user/current', (req, res) => (req.user ? res.status(statusCodes.OK).json(req.user) : generateError(req, res, statusCodes.unauthorized, 'no user logged in')));
 
 // User registeration
 router.post('/user',
-  redirectUserIfLoggedIn(indexPage),
+  onlyGuests(),
   async (req, res) => {
     try {
       const {
@@ -52,22 +52,23 @@ router.post('/user',
       logger.info(`new user registered, email: ${email}`);
       return res.sendStatus(statusCodes.created);
     } catch (err) {
+      console.log(err);
       return generateError(req, res, statusCodes.internalServerError, 'server error');
     }
   });
 
 // User log in
 router.post('/user/login',
-  redirectUserIfLoggedIn(indexPage),
+  onlyGuests(),
   async (req, res) => {
     try {
       const { email, password } = req.body;
       if (!email || !password) return generateError(req, res, statusCodes.badRequest, 'missing credentials');
       const user = await User.findOne({ where: { email } });
-      if (!user) return generateError(req, res, statusCodes.unauthorized, 'bad credentials');
+      if (!user) return generateError(req, res, statusCodes.unauthorized, 'wrong email or password');
       if (!user.password) return generateError(req, res, statusCodes.unauthorized, 'google account');
       const isMatch = await compare(password, user.password);
-      if (!isMatch) return generateError(req, res, statusCodes.unauthorized, 'bad credentials');
+      if (!isMatch) return generateError(req, res, statusCodes.unauthorized, 'wrong email or password');
       logger.info(`user: ${user.id} logged in successfully`);
       return res.cookie('jwt', sign({ id: req.user.id }, jwtCredentials.secret, { expiresIn: '12h' }), { maxAge: 43200000 }).sendStatus(statusCodes.OK);
     } catch (err) {
@@ -77,7 +78,7 @@ router.post('/user/login',
 
 // User info update
 router.put('/user',
-  redirectGuest(indexPage),
+  onlyUsers(),
   async (req, res) => {
     try {
       const { first_name, last_name } = req.body;
@@ -100,7 +101,8 @@ router.put('/user',
 
 // User account delete
 router.delete('/user',
-  // TODO: Authorization check
+  //TODO: AUTHORIZATION
+  onlyUsers(),
   async (req, res) => {
     try {
       const { id } = req.body;
@@ -132,8 +134,8 @@ router.put('/user/reset',
         secure: true,
         auth: emailCredentials,
         tls: {
-          rejectUnauthorized: false
-        }
+          rejectUnauthorized: false,
+        },
       });
       const mailOptions = {
         to: email,

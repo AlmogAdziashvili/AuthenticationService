@@ -36,13 +36,13 @@ utils.jwtAutenticator = () => (req, res, next) => passport.authenticate('jwt', {
   })(req, res, next);
 
 // Redirect the user to a selected path only if the user is currently logged
-utils.redirectUserIfLoggedIn = (path) => (req, res, next) => (
-  req.user ? res.redirect(path) : next()
+utils.onlyGuests = () => (req, res, next) => (
+  req.user ? utils.generateError(req, res, utils.statusCodes.unauthorized, 'not authorized') : next()
 );
 
 // Redirect the user to a selected path only if the user is not currently logged
-utils.redirectGuest = (path) => (req, res, next) => (
-  req.user ? next() : res.redirect(path)
+utils.onlyUsers = () => (req, res, next) => (
+  req.user ? next() : utils.generateError(req, res, utils.statusCodes.unauthorized, 'not authorized')
 );
 
 module.exports = utils;
