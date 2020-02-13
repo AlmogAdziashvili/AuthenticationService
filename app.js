@@ -13,6 +13,7 @@ const { statusCodes, generateError, jwtAutenticator } = require('./handlers/util
 
 const authRouter = require('./routes/auth_route');
 const googleRoute = require('./routes/google_route');
+const premissionsRoute = require('./routes/premissions_route');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(jwtAutenticator());
 // Routes
 app.use('/api', authRouter);
 app.use('/api/google', googleRoute);
+app.use('/api/premissions', premissionsRoute)
 
 // 404
 app.use((req, res) => generateError(req, res, statusCodes.notFound, 'This path is not on the API'));
