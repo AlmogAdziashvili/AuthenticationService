@@ -2,15 +2,15 @@ const express = require('express');
 const { hash, compare } = require('bcrypt');
 const { sign } = require('jsonwebtoken');
 const { randomBytes } = require('crypto');
-const { createTransport } = require('nodemailer');
 const { Op } = require('sequelize')
+const { sendResetMail } = require('../handlers/mail');
 const {
   statusCodes, onlyGuests, generateError, onlyUsers,
 } = require('../handlers/utils');
 const { resetPage } = require('../.config').webServerUrls;
 const User = require('../models/user');
 const logger = require('../handlers/logger');
-const { jwtCredentials, emailCredentials } = require('../.config');
+const { jwtCredentials } = require('../.config');
 
 const router = express.Router();
 
@@ -70,7 +70,7 @@ router.post('/user/login',
       const isMatch = await compare(password, user.password);
       if (!isMatch) return generateError(req, res, statusCodes.unauthorized, 'wrong email or password');
       logger.info(`user: ${user.id} logged in successfully`);
-      return res.cookie('jwt', sign({ id: req.user.id }, jwtCredentials.secret, { expiresIn: '12h' }), { maxAge: 43200000 }).sendStatus(statusCodes.OK);
+      return res.cookie('jwt', sign({ id: user.id }, jwtCredentials.secret, { expiresIn: '12h' }), { maxAge: 43200000 }).sendStatus(statusCodes.OK);
     } catch (err) {
       return generateError(req, res, statusCodes.internalServerError, 'server error');
     }
@@ -128,29 +128,7 @@ router.put('/user/reset',
       user.resetPasswordToken = token;
       user.resetPasswordExpires = Date.now() + 3600000;
       await user.save();
-      const smtpTransport = createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: emailCredentials,
-        tls: {
-          rejectUnauthorized: false,
-        },
-      });
-      const mailOptions = {
-        to: email,
-        from: "moshememes@support.com",
-        subject: "Password Reset for MosheMemes",
-        text:
-          "You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n" +
-          "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-          "http://" +
-          resetPage +
-          token +
-          "\n\n" +
-          "If you did not request this, please ignore this email and your password will remain unchanged.\n"
-      };
-      await smtpTransport.sendMail(mailOptions);
+      await sendResetMail(email, resetPage, token);
       logger.info(`user asked to change password, email: ${user.email}`);
       return res.sendStatus(statusCodes.OK);
     } catch (err) {

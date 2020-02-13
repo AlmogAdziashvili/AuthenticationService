@@ -1,14 +1,14 @@
 {
   "name": "authentication-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "authentication and authorization server for web apps",
   "main": "app.js",
   "scripts": {
     "start": "set NODE_ENV=production&& node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "test": "set NODE_ENV=test&& mocha ./tests/ --exit",
-    "testN": "set NODE_ENV=test&& mocha ./tests/ --reporter nyan --exit",
-    "coverage": "set NODE_ENV=production&& nyc mocha ./tests/ --exit"
+    "test": "set NODE_ENV=test&& mocha ./tests/ --timeout 15000 --exit",
+    "testN": "set NODE_ENV=test&& mocha ./tests/ --reporter nyan --timeout 15000 --exit",
+    "coverage": "set NODE_ENV=production&& nyc mocha ./tests/ --timeout 15000 --exit"
   },
   "dependencies": {
     "bcrypt": "3.0.8",
