@@ -13,7 +13,8 @@ const sequelize = new Sequelize(
     host,
     dialect: 'mysql',
     logging: false,
-  });
+  },
+);
 
 // Test the connection and log
 sequelize.authenticate().then(

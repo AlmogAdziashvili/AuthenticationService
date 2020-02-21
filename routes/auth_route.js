@@ -2,7 +2,7 @@ const express = require('express');
 const { hash, compare } = require('bcrypt');
 const { sign } = require('jsonwebtoken');
 const { randomBytes } = require('crypto');
-const { Op } = require('sequelize')
+const { Op } = require('sequelize');
 const { sendResetMail } = require('../handlers/mail');
 const {
   statusCodes, onlyGuests, generateError, onlyUsers,
@@ -52,7 +52,6 @@ router.post('/user',
       logger.info(`new user registered, email: ${email}`);
       return res.sendStatus(statusCodes.created);
     } catch (err) {
-      console.log(err);
       return generateError(req, res, statusCodes.internalServerError, 'server error');
     }
   });
@@ -93,22 +92,6 @@ router.put('/user',
       }
       await req.user.save();
       logger.info(`user updated info, email: ${req.user.email}`);
-      return res.sendStatus(statusCodes.OK);
-    } catch (err) {
-      return generateError(req, res, statusCodes.internalServerError, 'server error');
-    }
-  });
-
-// User account delete
-router.delete('/user',
-  //TODO: AUTHORIZATION
-  onlyUsers(),
-  async (req, res) => {
-    try {
-      const { id } = req.body;
-      if (Number.isNaN(parseInt(id))) return generateError(req, res, statusCodes.badRequest, 'unvalid credentials');
-      await User.destroy({ where: { id } });
-      logger.info(`user deleted, id: ${id}`);
       return res.sendStatus(statusCodes.OK);
     } catch (err) {
       return generateError(req, res, statusCodes.internalServerError, 'server error');
@@ -159,6 +142,21 @@ router.put('/user/reset/:token',
       user.resetPasswordExpires = null;
       await user.save();
       logger.info(`user changed the password, email: ${user.email}`);
+      return res.sendStatus(statusCodes.OK);
+    } catch (err) {
+      return generateError(req, res, statusCodes.internalServerError, 'server error');
+    }
+  });
+
+// User account delete
+router.delete('/user',
+  onlyUsers(),
+  async (req, res) => {
+    try {
+      const { id } = req.body;
+      if (Number.isNaN(parseInt(id, 10))) return generateError(req, res, statusCodes.badRequest, 'unvalid credentials');
+      await User.destroy({ where: { id } });
+      logger.info(`user deleted, id: ${id}`);
       return res.sendStatus(statusCodes.OK);
     } catch (err) {
       return generateError(req, res, statusCodes.internalServerError, 'server error');

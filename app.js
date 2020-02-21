@@ -29,7 +29,7 @@ app.use(jwtAutenticator());
 // Routes
 app.use('/api', authRouter);
 app.use('/api/google', googleRoute);
-app.use('/api/premissions', premissionsRoute)
+app.use('/api/premissions', premissionsRoute);
 
 // 404
 app.use((req, res) => generateError(req, res, statusCodes.notFound, 'This path is not on the API'));

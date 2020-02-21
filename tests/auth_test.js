@@ -9,7 +9,7 @@ let Cookie;
 before(async () => {
   await User.destroy({
     where: {},
-    truncate: true
+    truncate: true,
   });
 });
 
@@ -36,7 +36,9 @@ describe('Guest', () => {
       request(app)
         .post('/api/user')
         .set({ Accept: 'application/json' })
-        .send({ email: 'test@test.com', first_name: 'test', last_name: 'test', password: '123456' })
+        .send({
+          email: 'test@test.com', first_name: 'test', last_name: 'test', password: '123456',
+        })
         .expect('Content-Type', /json/)
         .expect(statusCodes.badRequest, done);
     });
@@ -44,14 +46,18 @@ describe('Guest', () => {
       request(app)
         .post('/api/user')
         .set({ Accept: 'application/json' })
-        .send({ email: 'test@test.com', first_name: 'test', last_name: 'test', password: 'Aa123456' })
+        .send({
+          email: 'test@test.com', first_name: 'test', last_name: 'test', password: 'Aa123456',
+        })
         .expect(statusCodes.created, done);
     });
     it('Email exists: Code 400', (done) => {
       request(app)
         .post('/api/user')
         .set({ Accept: 'application/json' })
-        .send({ email: 'test@test.com', first_name: 'test', last_name: 'test', password: '123456' })
+        .send({
+          email: 'test@test.com', first_name: 'test', last_name: 'test', password: '123456',
+        })
         .expect('Content-Type', /json/)
         .expect(statusCodes.badRequest, done);
     });
@@ -87,7 +93,7 @@ describe('Guest', () => {
         .set({ Accept: 'application/json' })
         .send({ email: 'test@test.com', password: 'Aa123456' })
         .expect(statusCodes.OK)
-        .then(res => {
+        .then((res) => {
           const jwtCookie = res.header['set-cookie'][0].substring(4, res.header['set-cookie'][0].indexOf(';'));
           Cookie = [`jwt=${jwtCookie}`];
           return done();
@@ -140,7 +146,7 @@ describe('Guest', () => {
   describe('PUT /api/user/reset/:token', () => {
     let token;
     before(async () => {
-      const user = await User.findOne({ where: { email: "test@test.com" } });
+      const user = await User.findOne({ where: { email: 'test@test.com' } });
       token = user.resetPasswordToken;
     });
     it('Missing Data: Code 400', (done) => {
